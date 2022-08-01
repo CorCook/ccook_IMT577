@@ -1,0 +1,302 @@
+Create or replace table Dim_Location(
+    DimLocationID int identity (38,1) constraint PK_LocationID Primary Key Not Null
+    ,address varchar (255) Not Null
+    ,city varchar (255) Not Null
+    ,postalcode varchar (255) Not Null
+    ,state_province varchar (255) Not Null
+    ,country varchar (255) Not Null
+);
+
+insert into Dim_Location(
+    DimLocationID
+    ,address
+    ,city
+    ,postalcode
+    ,state_province
+    ,country
+)
+values(
+    -1
+    ,'Unknown'
+    ,'Unknown'
+    ,'Unknown'
+    ,'Unknown'
+    ,'Unknown'
+);
+select * from Project_Customer_Azure_Stage
+
+insert into Dim_Location (
+    DimLocationID
+    ,address
+    ,city
+    ,postalcode
+    ,state_province
+    ,country)
+SELECT 
+SubsegmentID as DimLocationID 
+,address
+,city 
+,postalcode 
+,stateprovince 
+,country 
+FROM Project_Customer_Azure_Stage
+SELECT * Dim_Location
+
+CREATE or REPLACE TABLE Dim_Store(
+    DimStoreID INT IDENTITY (38,1) CONSTRAINT PK_StoreID PRIMARY KEY NOT NULL
+    ,DimLocationID INTEGER NOT NULL
+    ,SourceStoreID INTEGER not NULL
+    ,StoreName VARCHAR (255) Not NULL
+    ,StoreNumber INTEGER NOT NULL
+    ,StoreManager VARCHAR (255) NOT NULL
+);
+
+INSERT INTO Dim_Store(
+    DimStoreID
+    ,DimLocationID
+    ,SourceStoreID
+    ,StoreName
+    ,StoreNumber
+    ,StoreManager
+)
+VALUES (
+    -1
+    ,-1
+    ,-1
+    ,'Unknown'
+    ,-1
+    ,'Unknown'
+);
+SELECT * FROM Project_Store_Azure_Stage
+
+INSERT INTO Dim_Store(
+    DimStoreID
+    ,DimLocationID
+    ,SourceStoreID
+    ,StoreName
+    ,StoreNumber
+    ,StoreManager
+)
+SELECT StoreID as DimStoreID
+,SubsegmentID as DimLocationID
+,StoreID as SourceStoreID
+,SubsegmentID as StoreName
+,StoreNumber
+,StoreManager
+FROM Project_Store_Azure_Stage
+SELECT * Dim_Store
+
+
+CREATE or REPLACE TABLE Dim_Reseller(
+    DimResellerID INT IDENTITY CONSTRAINT PK_ResellerID PRIMARY KEY NOT NULL
+    ,DimLocationID INTEGER NOT NULL
+    ,ResellerID INTEGER NOT NULL
+    ,ResellerName VARCHAR (255) NOT NULL
+    ,ContactName VARCHAR (255) NOT NULL
+    ,PhoneNumber VARCHAR (255) NOT NULL
+    ,Email VARCHAR (255) NOT NULL
+);
+INSERT INTO Dim_Reseller(
+    DimResellerID
+    ,DimLocationID
+    ,ResellerID
+    ,ResellerName
+    ,ContactName
+    ,PhoneNumber
+    ,Email
+)
+VALUES(
+    -1
+    ,-1
+    ,-1
+    ,'Unknown'
+    ,'Unknown'
+    ,'Unknown'
+    ,'Unknown'
+);
+SELECT * FROM Project_Reseller_Azure_Stage
+INSERT INTO Dim_Reseller(
+    DimResellerID
+    ,DimLocationID
+    ,ResellerID
+    ,ResellerName
+    ,ContactName
+    ,PhoneNumber
+    ,Email
+)
+SELECT ResellerID as DimResellerID
+,DimLocationID as DimLocationID
+,ResellerID as ResellerID
+,ResellerName
+,Contact as ContactName
+,PhoneNumber
+,EmailAddress as Email
+FROM Project_Reseller_Azure_Stage
+Inner Join Dim_Location on R.DimLocationID = L.LocationID
+SELECT * Dim_Reseller
+
+
+CREATE or REPLACE table Dim_Customer(
+    DimCustomerID INT IDENTITY CONSTRAINT PK_CustomerID PRIMARY KEY NOT NULL
+    ,DimLocationID INTEGER NOT NULL
+    ,CustomerID INTEGER NOT NULL
+    ,CustomerFullName VARCHAR (255) not NULL
+    ,CustomerFirstName VARCHAR (255) NOT NULL
+    ,CustomerLastName VARCHAR (255) NOT NULL
+    ,CustomerGender VARCHAR (255) NOT NULL
+);
+
+INSERT INTO Dim_Customer(
+    DimCustomerID
+    ,DimLocationID
+    ,CustomerID
+    ,CustomerFullName
+    ,CustomerFirstName
+    ,CustomerLastName
+    ,CustomerGender 
+)
+VALUES(
+    -1
+    ,-1
+    ,-1
+    ,'Unknown'
+    ,'Unknown'
+    ,'Unknown'
+    ,'Unknown'
+);
+
+SELECT * FROM Project_Customer_Azure_Stage
+INSERT INTO Dim_Customer(
+    DimCustomerID
+    ,DimLocationID
+    ,CustomerID
+    ,CustomerFullName
+    ,Firstname as CustomerFirstName
+    ,Lastname as CustomerLastName
+    ,Gender as CustomerGender 
+)
+SELECT CustomerID as DimCustomerID
+,SubsegmentID as DimLocationID 
+,CustomerID as CustomerID
+,CustomerFullName
+,CustomerFirstName
+,CustomerLastName
+,CustomerGender 
+FROM Project_Customer_Azure_Stage
+SELECT * Dim_Customer
+
+
+CREATE or REPLACE TABLE Dim_Channel(
+    DimChannelID INT IDENTITY (38,1) CONSTRAINT PK_ChannelID PRIMARY KEY NOT NULL
+    ,ChannelID INTEGER NOT NULL
+    ,ChannelCategoryID INTEGER NOT NULL
+    ,ChannelName VARCHAR (255) NOT NULL
+    ,ChannelCategory VARCHAR (255) NOT NULL
+);
+INSERT INTO Dim_Channel(
+    DimChannelID
+    ,ChannelID
+    ,ChannelCategoryID
+    ,ChannelName
+    ,ChannelCategory
+)
+VALUES(
+    -1
+    ,-1
+    ,-1
+    ,'Unknown'
+    ,'Unknown'
+);
+SELECT * FROM Project_Channel_Azure_Project
+INSERT INTO Dim_Channel(
+    DimChannelID
+    ,ChannelID
+    ,ChannelCategoryID
+    ,ChannelName
+    ,ChannelCategory
+)
+SELECT ChannelID as DimChannelID
+,ChannelID as ChannelID
+,ChannelCategoryID as ChannelCategoryID
+,Channel as ChannelName
+,ChannelCategory
+FROM Project_Channel_Azure_Project
+SELECT * Dim_Channel 
+
+
+CREATE or REPLACE TABLE Dim_Product(
+    DimProductID INT IDENTITY (38,1) CONSTRAINT PK_ProductID PRIMARY KEY NOT NULL
+    ,ProductID INTEGER not NULL
+    ,ProductTypeID INTEGER NOT NULL
+    ,ProductCategoryID INTEGER NOT NULL
+    ,ProductName VARCHAR (255) NOT NULL
+    ,ProductType VARCHAR (255) NOT NULL
+    ,ProductCategory VARCHAR (255) NOT NULL
+    ,ProductRetailPrice FLOAT NOT NULL
+    ,ProductWholesalePrice FLOAT NOT NULL
+    ,ProductCost FLOAT NOT NULL
+    ,ProductRetailProfit FLOAT NOT NULL
+    ,ProductWholesaleUnitProfit FLOAT NOT NULL
+    ,ProductProfitMarginUnitPercent FLOAT NOT NULL
+);
+INSERT INTO Dim_Product(
+    DimProductID
+    ,ProductID
+    ,ProductTypeID
+    ,ProductCategoryID
+    ,ProductName
+    ,ProductType
+    ,ProductCategory
+    ,ProductRetailPrice
+    ,ProductWholesalePrice
+    ,ProductCost
+    ,ProductRetailProfit
+    ,ProductWholesaleUnitProfit
+    ,ProductProfitMarginUnitPercent
+)
+VALUES(
+    -1
+    ,-1
+    ,-1
+    ,-1
+    ,'Unknown'
+    ,'Unknown'
+    ,'Unknown'
+    ,-1
+    ,-1
+    ,-1
+    ,-1
+    ,-1
+    ,-1
+);
+SELECT * FROM Project_Product_Azure_Stage
+INSERT INTO Dim_Product(
+    DimProductID
+    ,ProductID
+    ,ProductTypeID
+    ,ProductCategoryID
+    ,ProductName
+    ,ProductType
+    ,ProductCategory
+    ,ProductRetailPrice
+    ,ProductWholesalePrice
+    ,ProductCost
+    ,ProductRetailProfit
+    ,ProductWholesaleUnitProfit
+    ,ProductProfitMarginUnitPercent
+)
+SELECT ProductID as DimProductID
+,ProductID as ProductID 
+    ,ProductTypeID as ProductTypeID
+    ,ProductCategoryID as ProductCategoryID 
+    ,Product as ProductName
+    ,ProductType as ProductType
+    ,ProductCategory as ProductCategory
+    ,ProductRetailPrice
+    ,ProductWholesalePrice
+    ,ProductCost
+    ,ProductRetailProfit
+    ,ProductWholesaleUnitProfit
+    ,ProductProfitMarginUnitPercent
+    FROM Project_Product_Azure_Stage
+    SELECT * Dim_Product
