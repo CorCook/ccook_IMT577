@@ -1,0 +1,130 @@
+create TABLE Fact_SalesTarget 
+(
+    DimStoreID INT CONSTRAINT FK_DimStoreID FOREIGN KEY REFERENCES Dim_Store (DimStoreID)
+    ,DimResellerID INT CONSTRAINT FK_DimResellerID FOREIGN KEY REFERENCES Dim_Reseller (DimResellerID)
+    ,DimChannelID INT CONSTRAINT FK_DimChannelID FOREIGN KEY REFERENCES Dim_Channel (DimChannelID)
+    ,DimTargetDateID Date CONSTRAINT FK_DimTargetDateID FOREIGN KEY REFERENCES Dim_Date (Date)
+    ,SalesTargetAmount FLOAT
+);
+
+INSERT INTO Fact_SalesTaget
+(
+    DimStoreID
+    ,DimResellerID
+    ,DimChannelID
+    ,DimTargetDateID
+    ,SalesTargetAmount
+)
+SELECT DISTINCT 
+Dim_Store.DimStoreID
+,Dim_Reseller.DimResellerID
+,Dim_Channel.DimChannelID
+,Dim_Date.DimTargetDateID
+,SalesTarget.SalesTargetAmount
+FROM Project_Store_Azure_Stage
+INNER JOIN Dim_Store ON
+Dim_Store.DimStoreID = Project_Store_Azure_Stage.StoreID
+INNER JOIN Dim_Reseller ON
+Dim_Reseller.DimResellerID = Project_Reseller_Azure_Stage.ResellerID
+INNER JOIN Dim_Channel ON
+Dim_Channel.DimChannelID = Project_Channel_Azure_Project.ChannelID
+INNER JOIN Dim_Date ON
+Dim_Date.Date = Project_Salesheader_Azure_Stage.Date
+
+
+
+
+
+CREATE TABLE Fact_ProductSalesTarget
+(
+    DimProductID INT CONSTRAINT FK_DimProductID FOREIGN KEY REFERENCES Dim_Product (DimProductID)
+    ,DimTargetDateID Date CONSTRAINT FK_DimTargetDateID FOREIGN KEY REFERENCES Dim_Date (Date_Pkey)
+    ,ProductTargetSalesQuantity FLOAT 
+);
+
+
+INSERT INTO Fact_ProductSalesTarget
+(
+    DimProductID
+    ,DimTargetDateID
+    ,ProductTargetSalesQuantity
+)
+SELECT DISTINCT
+Dim_Product.DimProductID
+,Dim_Date.DimTargetDateID
+,Stage_TargetSales.ProductTargetSalesQuantity
+FROM Project_Product_Azure_Stage 
+INNER JOIN Dim_Product ON
+Dim_Product.DimProductID = Project_Product_Azure_Stage.ProductID
+INNER JOIN Dim_Target ON 
+Dim_Date.Date = Project_Salesheader_Azure_Stage.Date
+
+
+
+
+CREATE TABLE Fact_SalesActual
+(
+    DimProductID INT CONSTRAINT FK_DimProductID FOREIGN KEY REFERENCES Dim_Product (DimProductID)
+    ,DimStoreID INT CONSTRAINT FK_DimStoreID FOREIGN KEY REFERENCES Dim_Store (DimStoreID)
+    ,DimResellerID INT CONSTRAINT FK_DimResellerID FOREIGN KEY REFERENCES Dim_Reseller (DimResellerID)
+    ,DimCustomerID INT CONSTRAINT FK_DimCustomerID FOREIGN KEY REFERENCES Dim_Customer (DimCustomerID)
+    ,DimChannelID INT CONSTRAINT FK_DimChannelID FOREIGN KEY REFERENCES Dim_Channel (DimChannelID)
+    ,DimSaleDateID INT CONSTRAINT FK_DimSaleDateID FOREIGN KEY REFERENCES Dim_Date (DimSaleDateID)
+    ,DimLocationID INT CONSTRAINT FK_DimLocationID FOREIGN KEY REFERENCES Dim_Location (DimLocationID)
+    ,SalesHeaderID INT
+    ,SalesDetailID INT
+    ,SaleAmount FLOAT
+    ,SaleQuantity INT
+    ,SaleUnitPrice FLOAT
+    ,SaleExtendedCost FLOAT
+    ,SaleTotalProfit FLOAT
+);
+
+INSERT INTO Fact_SalesActual
+(
+    DimProductID
+    ,DimStoreID
+    ,DimResellerID
+    ,DimCustomerID
+    ,DimChannelID
+    ,DimSaleDate
+    ,DimLocationID
+    ,SalesHeaderID 
+    ,SalesDetailID
+    ,SaleAmount
+    ,SaleQuantity
+    ,SaleUnitPrice
+    ,SaleExtendedCost
+    ,SaleTotalProfit
+)
+
+SELECT DISTINCT 
+Dim_Product.ProductID
+,Dim_Store.DimStoreID
+,Dim_Reseller.DimResellerID
+,Dim_Customer.DimCustomerID
+,Dim_Channel.DimChannelID
+,Dim_Sale.DimSaleDateID
+,Dim_Location.DimLocationID
+,SalesActual.SalesHeaderID
+,SalesActual.SalesDetailID
+,SalesActual.SaleAmount
+,SalesActual.SaleQuantity
+,SalesActual.SaleUnitPrice
+,SalesActual.SaleExtendedCost
+,SalesActual.SaleTotalProfit
+FROM Project_Salesdetail_Azure_Stage
+INNER JOIN Dim_Product ON
+Dim_Product.ProductID = Project_Salesdetail_Azure_Stage.ProductID
+INNER JOIN Dim_Store ON
+Dim_Store.DimStoreID = Project_Store_Azure_Stage.StoreID
+INNER JOIN Dim_Reseller ON
+Dim_Reseller.DimResellerID = Project_Reseller_Azure_Stage.ResellerID
+INNER JOIN Dim_Customer ON
+Dim_Customer.DimCustomerID = Project_Customer_Azure_Stage.CustomerID
+INNER JOIN Dim_Channel ON
+Dim_Channel.DimChannelID = Project_Channel_Azure_Project.ChannelID
+INNER JOIN Dim_Sale ON
+Dim_Sale.DimSaleID = Project_Salesheader_Azure_Stage.SalesHeaderID
+INNER JOIN Dim_Location ON
+Dim_Location.DimLocationID = Project_Store_Azure_Stage.SubsegmentID
