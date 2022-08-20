@@ -1,0 +1,193 @@
+#Question 2 View
+CREATE or REPLACE secure VIEW BonusAmounts AS
+Select
+Dim_Product.ProductType
+,Dim_Store.StoreNumber
+,Dim_Date.Fiscal_Year
+From Fact_ProductSalesTarget
+Join Dim_Store on Dim_Store.StoreID = FACT_SRCSALESTARGET.DimStoreID
+JOIN Dim_Date on Dim_Date.DATE_PKEY
+WHERE Dim_Store.StoreNumber = '5' or Dim_Store.StoreNumber = '8'
+WHERE Dim_Date.Fiscal_Year = '2020' or Dim_Date.Fiscal_Year = '2021'
+WHERE Dim_Product.ProductType = 'Mens Casual' or Dim_Product.ProductType = 'Womens Casual'
+Group By Dim_Store.StoreNumber
+
+#Question 4 View
+create or replace secure view StorePerformanceMoreThanOne AS
+SELECT
+Dim_LOCATION.State_Province
+,Dim_Store.StoreName
+,AVG (SaleTotalProfit) as SaleTotalProfit
+FROM fact_SalesActual
+JOIN Dim_Location ON Dim_Location.DimLocationID = Fact_SalesActual.DimLocationID
+JOIN Dim_Store on Dim_Store.DimStoreID = Fact_SalesActual.DimStoreID
+WHERE (Dim_Location.State_Province) > 1 
+GROUP BY Dim_Store.DimStoreID, Dim_Location.State_Province, Dim_Store.StoreName
+
+create or replace secure view StorePerformanceOnlyOne AS
+SELECT
+Dim_LOCATION.State_Province
+,Dim_Store.StoreName
+,AVG (SaleTotalProfit) as SaleTotalProfit
+FROM fact_SalesActual
+JOIN Dim_Location ON Dim_Location.DimLocationID = Fact_SalesActual.DimLocationID
+JOIN Dim_Store on Dim_Store.DimStoreID = Fact_SalesActual.DimStoreID
+WHERE (Dim_Location.State_Province) = 1 
+GROUP BY Dim_Store.DimStoreID, Dim_Location.State_Province, Dim_Store.StoreName
+
+#Question 3 View
+Create or replace secure view SalesAssessment as
+Select
+Dim_Store.StoreNumber
+,AVG (SaleAmount) as SaleAmount
+,AVG (SaleQuantity) as SaleQuantity
+,Dim_Product.ProductType
+,Dim_Date.Day_Name
+From Fact_SalesActual
+Join Dim_Product on Dim_Product.DimProductID = Fact_SalesActual.DimProductID
+Join Dim_Store on Dim_Store.DimStoreID = Fact_SalesActual.DimStoreID
+Join Dim_Date on Dim_Date.Date_PKey = Fact_SalesActual.DimStoreID
+Where (Dim_Store.StoreNumber = '5' or Dim_Store.StoreNumber = '8')
+Group By Dim_Store.StoreNumber, Dim_Date.Day_Name, Dim_Product.ProductType
+
+
+#Pass Through Views
+Create or replace secure view ChannelView as
+Select
+DimChannelID
+,ChannelID
+,ChannelCategoryID
+,ChannelName
+,ChannelCategory
+From Dim_Channel
+
+Create or replace secure view CustomerView as
+Select
+DimCustomerID
+,DimLocationID
+,CustomerID
+,CustomerFullName
+,CustomerFirstName
+,CustomerLastName
+,CustomerGender
+From Dim_Customer
+
+Create or replace secure view DateView as
+Select
+Date_PKey
+,Date
+,Full_Date_Desc
+,Day_Num_In_Week
+,Day_Num_In_Month
+,Day_Num_In_Year
+,Day_Name
+,Day_Abbrev
+,Weekday_Ind
+,US_Holiday_Ind
+,Month_End_Ind
+,Week_Begin_Date_NKey
+,Week_Begin_Date
+,Week_End_Date_NKey
+,Week_End_Date
+,Week_Num_In_Year
+,Month_Name
+,Month_Abbrev
+,Month_Num_In_Year
+,YearMonth
+,Quarter
+,YearQuarter
+,Year
+,Fiscal_Week_Num
+,Fiscal_Month_Num
+,Fiscal_YearMonth
+,Fiscal_Quarter
+,Fiscal_YearQuarter
+,Fiscal_HalfYear
+,Fiscal_Year
+,SQL_Timestamp
+,Current_Row_IND
+,Effective_Date
+,Expiration_Date
+From Dim_Date
+
+Create or replace secure view LocationView as
+Select
+DimLocationID
+,Address
+,City
+,PostalCode
+,State_Province
+,Country
+From Dim_Location
+
+Create or replace secure view ProductView as
+Select
+DimProductID
+,ProductID
+,ProductTypeID
+,ProductCategoryID
+,ProductName
+,ProductType
+,ProductCategory
+,ProductRetailPrice
+,ProductWholesalePrice
+,ProductCost
+,ProductRetailProfit
+,ProductWholesaleUnitProfit
+,ProductProfitMarginUnitPercent
+From Dim_Product
+
+Create or replace secure view ResellerView as
+Select
+DimResellerID
+,DimLocationID
+,ResellerID
+,ResellerName
+,ContactName
+,PhoneNumber
+,Email
+From Dim_Reseller
+
+Create or replace secure view StoreView as
+Select
+DimStoreID
+,DimLocationID
+,SourceStoreID
+,StoreName
+,StoreNumber
+,StoreManager
+From Dim_Store
+
+Create or replace secure view ProductTargetView as
+Select
+DimProductID
+,DimTargetDateID
+,ProductTargetSalesQuantity
+From Fact_ProductSalesTarget
+
+Create or replace secure view SalesActualView as
+Select
+DimProductID
+,DimStoreID
+,DimResellerID
+,DimCustomerID
+,DimChannelID
+,Date_PKey
+,DimLocationID
+,SalesHEaderID
+,SalesDetailID
+,SaleAmount
+,SaleQuantity
+,SaleUnitPrice
+,SaleExtendedCost
+,SaleTotalProfit
+From Fact_SalesActual
+
+Create or replace secure view SalesTargetView as
+Select
+DimStoreID
+,DimResellerID
+,DimChannelID
+,DimTargetDateID
+,SalesTargetAmount
+From Fact_SalesTarget
